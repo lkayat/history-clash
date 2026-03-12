@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useGameStore } from './hooks/useGameState.js';
 import { HomeScreen } from './components/screens/HomeScreen.jsx';
 import { ScenarioSelect } from './components/screens/ScenarioSelect.jsx';
@@ -6,16 +7,23 @@ import { GameCanvas } from './components/game/GameCanvas.jsx';
 import { GameOverScreen } from './components/screens/GameOverScreen.jsx';
 
 export default function App() {
-  const { screen, session } = useGameStore();
+  // Use individual selectors so App only re-renders when screen or session change,
+  // NOT when in-game UI state (timeLeft, myHand, etc.) updates every 100ms.
+  const screen = useGameStore((s) => s.screen);
+  const session = useGameStore((s) => s.session);
 
-  const matchConfig = session
-    ? {
-        scenarioId: session.scenarioId,
-        hostFaction: session.hostFaction,
-        guestFaction: session.guestFaction,
-        code: session.code,
-      }
-    : null;
+  const matchConfig = useMemo(
+    () =>
+      session
+        ? {
+            scenarioId: session.scenarioId,
+            hostFaction: session.hostFaction,
+            guestFaction: session.guestFaction,
+            code: session.code,
+          }
+        : null,
+    [session],
+  );
 
   return (
     <div className="w-screen h-screen overflow-hidden">

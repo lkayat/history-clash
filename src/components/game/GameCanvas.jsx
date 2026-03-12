@@ -131,7 +131,7 @@ export function GameCanvas({ matchConfig }) {
       clearFacts();
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [matchConfig]);
+  }, []);
 
   // ─── Canvas DPI setup ─────────────────────────────────────────────────
   useEffect(() => {
