@@ -2,7 +2,7 @@
 // Game state lives in a useRef (never re-renders canvas via React state).
 // Bridges to Zustand every ~100ms for UI overlay updates.
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { useGameStore } from '../../hooks/useGameState.js';
 import { useMultiplayer } from '../../hooks/useMultiplayer.js';
 import { buildSpriteCache, svgSprites, svgWalkSprites } from '../../data/svgSprites.js';
@@ -32,6 +32,8 @@ export function GameCanvas({ matchConfig }) {
   const uiSyncRef = useRef(0);
   const syncIntervalRef = useRef(null);
   const loadedRef = useRef(false);
+  // Triggers re-render so CardHand receives the real sprite cache after async load
+  const [spritesReady, setSpritesReady] = useState(false);
 
   const {
     playerRole,
@@ -108,13 +110,18 @@ export function GameCanvas({ matchConfig }) {
       setTimeout(() => enqueueFact(briefing), 500);
     }
 
-    // Build sprite caches
+    // Build sprite caches, then start loop.
+    // .finally() ensures the loop starts even if some sprites fail to load.
     Promise.all([
       buildSpriteCache(svgSprites),
       buildSpriteCache(svgWalkSprites),
     ]).then(([stand, walk]) => {
       spriteCacheRef.current = stand;
       walkCacheRef.current = walk;
+    }).catch((err) => {
+      console.warn('Sprite cache build failed, continuing without art:', err);
+    }).finally(() => {
+      setSpritesReady(true);
       startGameLoop();
     });
 
@@ -288,7 +295,7 @@ export function GameCanvas({ matchConfig }) {
       {/* Card hand at bottom */}
       <div className="bg-stone-950/90 backdrop-blur-sm border-t border-stone-800 py-2 px-3">
         <CardHand
-          spriteCache={spriteCacheRef.current}
+          spriteCache={spritesReady ? spriteCacheRef.current : null}
           onDeploy={handleDeploy}
         />
       </div>
