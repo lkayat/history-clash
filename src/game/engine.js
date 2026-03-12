@@ -644,23 +644,37 @@ export function serializeState(state) {
       x: u.x,
       y: u.y,
       hp: u.hp,
+      maxHp: u.maxHp,
       state: u.state,
       type: u.type,
       isLeader: u.isLeader,
+      isHealer: u.isHealer,
       svgKey: u.svgKey,
+      svgWalkKey: u.svgWalkKey,
+      stats: u.stats,
+      targetPriority: u.targetPriority,
+      speedMultiplier: u.speedMultiplier,
+      damageMultiplier: u.damageMultiplier,
+      lifetime: u.lifetime,
+      diedAt: u.diedAt,
+      lastAttackTime: u.lastAttackTime,
+      lastHealTime: u.lastHealTime,
+      historicalFactIds: u.historicalFactIds,
     })),
     towers: state.towers.map((t) => ({
       id: t.id,
       hp: t.hp,
+      fell: t.fell,
     })),
     spellEffects: state.spellEffects.map((s) => ({
       id: s.id,
       cardId: s.cardId,
+      owner: s.owner,
       x: s.x,
       y: s.y,
       lifetime: s.lifetime,
       spellType: s.spellType,
-      stats: { radius: s.stats.radius },
+      stats: s.stats,
     })),
     winner: state.winner,
   };
@@ -675,7 +689,7 @@ export function reconcileState(localState, authoritative) {
   const towers = localState.towers.map((t) => {
     const auth = authoritative.towers?.find((at) => at.id === t.id);
     if (!auth) return t;
-    return { ...t, hp: auth.hp };
+    return { ...t, hp: auth.hp, fell: auth.fell || t.fell };
   });
 
   // Merge units: lerp positions for existing, add new, remove missing
@@ -683,8 +697,8 @@ export function reconcileState(localState, authoritative) {
   const mergedUnits = authUnits.map((au) => {
     const local = localState.units.find((u) => u.id === au.id);
     if (!local) {
-      // New unit from host — need full stats from card registry
-      return { ...au, x: au.x, y: au.y };
+      // New unit from host — serialized state now includes full stats
+      return { ...au };
     }
     // Lerp position: move 30% toward authoritative position
     return {
@@ -696,6 +710,9 @@ export function reconcileState(localState, authoritative) {
     };
   });
 
+  // Merge spell effects from host
+  const authSpells = authoritative.spellEffects || [];
+
   return {
     ...localState,
     phase: authoritative.phase,
@@ -705,6 +722,7 @@ export function reconcileState(localState, authoritative) {
     guestManpower: authoritative.guestManpower,
     towers,
     units: mergedUnits,
+    spellEffects: authSpells,
     winner: authoritative.winner,
   };
 }
