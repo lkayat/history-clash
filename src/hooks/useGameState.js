@@ -8,6 +8,10 @@ export const useGameStore = create((set, get) => ({
   screen: 'home', // 'home' | 'scenario-select' | 'lobby' | 'game' | 'game-over'
   setScreen: (screen) => set({ screen }),
 
+  // ─── Game mode (set before entering lobby) ──────────────────────────────
+  gameMode: null, // 'create' | 'join'
+  setGameMode: (mode) => set({ gameMode: mode }),
+
   // ─── Session ────────────────────────────────────────────────────────────
   session: null,       // { code, scenarioId, hostId, guestId, hostFaction, guestFaction }
   playerRole: null,    // 'host' | 'guest'
@@ -72,6 +76,7 @@ export const useGameStore = create((set, get) => ({
     set({
       session: null,
       playerRole: null,
+      gameMode: null,
       selectedScenario: null,
       selectedFaction: null,
       myManpower: 5,

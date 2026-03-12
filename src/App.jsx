@@ -6,7 +6,7 @@ import { GameCanvas } from './components/game/GameCanvas.jsx';
 import { GameOverScreen } from './components/screens/GameOverScreen.jsx';
 
 export default function App() {
-  const { screen, session, setScreen } = useGameStore();
+  const { screen, session } = useGameStore();
 
   const matchConfig = session
     ? {
@@ -17,13 +17,11 @@ export default function App() {
       }
     : null;
 
-  const handleMatchStart = () => setScreen('game');
-
   return (
     <div className="w-screen h-screen overflow-hidden">
       {screen === 'home' && <HomeScreen />}
       {screen === 'scenario-select' && <ScenarioSelect />}
-      {screen === 'lobby' && <LobbyScreen onMatchStart={handleMatchStart} />}
+      {screen === 'lobby' && <LobbyScreen />}
       {screen === 'game' && matchConfig && <GameCanvas matchConfig={matchConfig} />}
       {screen === 'game-over' && <GameOverScreen />}
     </div>

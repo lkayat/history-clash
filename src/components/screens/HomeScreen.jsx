@@ -3,12 +3,23 @@ import { getOrCreatePlayerId } from '../../lib/supabase.js';
 import { Button } from '../ui/Button.jsx';
 
 export function HomeScreen() {
-  const { setScreen, setPlayerId } = useGameStore();
+  const { setScreen, setPlayerId, setGameMode } = useGameStore();
 
-  const handlePlay = () => {
+  const init = () => {
     const id = getOrCreatePlayerId();
     setPlayerId(id);
+  };
+
+  const handleCreate = () => {
+    init();
+    setGameMode('create');
     setScreen('scenario-select');
+  };
+
+  const handleJoin = () => {
+    init();
+    setGameMode('join');
+    setScreen('lobby');
   };
 
   return (
@@ -70,8 +81,11 @@ export function HomeScreen() {
 
         {/* CTA */}
         <div className="flex flex-col gap-3 w-full max-w-xs">
-          <Button onClick={handlePlay} variant="primary" size="xl" className="w-full">
-            ⚔ Play
+          <Button onClick={handleCreate} variant="primary" size="xl" className="w-full">
+            ⚔ Create Game
+          </Button>
+          <Button onClick={handleJoin} variant="secondary" size="lg" className="w-full">
+            🔑 Join with Code
           </Button>
         </div>
 
