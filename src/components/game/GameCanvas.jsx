@@ -277,11 +277,11 @@ export function GameCanvas({ matchConfig }) {
   }, [isHost, myHand, broadcastUnitDeployed, broadcastFactTrigger, enqueueFact]);
 
   return (
-    <div className="relative w-full h-full flex flex-col overflow-hidden bg-stone-950">
-      {/* Game canvas — fills available space */}
+    <div className="relative w-full h-full overflow-hidden bg-stone-950">
+      {/* Game canvas — fills entire area */}
       <canvas
         ref={canvasRef}
-        className="flex-1 w-full"
+        className="absolute inset-0 w-full h-full"
         style={{ touchAction: 'none', display: 'block' }}
       />
 
@@ -292,8 +292,8 @@ export function GameCanvas({ matchConfig }) {
         </div>
       </div>
 
-      {/* Card hand at bottom */}
-      <div className="bg-stone-950/90 backdrop-blur-sm border-t border-stone-800 py-2 px-3">
+      {/* Card hand at bottom — overlays the canvas like a real game HUD */}
+      <div className="absolute bottom-0 left-0 right-0 bg-stone-950/90 backdrop-blur-sm border-t border-stone-800 py-2 px-3 z-10">
         <CardHand
           spriteCache={spritesReady ? spriteCacheRef.current : null}
           onDeploy={handleDeploy}
