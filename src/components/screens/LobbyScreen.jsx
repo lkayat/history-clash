@@ -31,7 +31,8 @@ export function LobbyScreen() {
       if (data?.guest_id && data?.guest_faction) {
         stopPolling();
         await startSession(generatedCode);
-        setSession((prev) => ({ ...prev, guestId: data.guest_id, guestFaction: data.guest_faction }));
+        const current = useGameStore.getState().session;
+        setSession({ ...current, guestId: data.guest_id, guestFaction: data.guest_faction });
         setScreen('game');
       }
     };
